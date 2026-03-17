@@ -1,0 +1,8 @@
+# PS module file cache
+currency_rate/cache/*.cache
+
+# env overrides (keep .env as template)
+.env.local
+
+# macOS
+.DS_Store

@@ -1,0 +1,69 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: botland_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-prestashop}
+      MYSQL_USER: ${MYSQL_USER:-prestashop}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-prestashop}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ps_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  prestashop:
+    image: prestashop/prestashop:9
+    container_name: botland_prestashop
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_SERVER: mysql
+      DB_NAME: ${MYSQL_DATABASE:-prestashop}
+      DB_USER: ${MYSQL_USER:-prestashop}
+      DB_PASSWD: ${MYSQL_PASSWORD:-prestashop}
+      PS_INSTALL_AUTO: 1
+      PS_DOMAIN: localhost:${PS_PORT:-8080}
+      PS_FOLDER_INSTALL: install
+      PS_FOLDER_ADMIN: admin
+      PS_COUNTRY: PL
+      PS_LANGUAGE: pl
+      PS_ADMIN_EMAIL: ${PS_ADMIN_EMAIL:-admin@example.com}
+      PS_ADMIN_PASSWD: ${PS_ADMIN_PASSWORD:-Admin1234!}
+      PS_ENABLE_SSL: 0
+      PS_DEV_MODE: 1
+    volumes:
+      - ps_data:/var/www/html
+      - ./currency_rate:/var/www/html/modules/currency_rate
+    ports:
+      - "${PS_PORT:-8080}:80"
+    networks:
+      - ps_net
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: botland_phpmyadmin
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+    ports:
+      - "${PMA_PORT:-8081}:80"
+    networks:
+      - ps_net
+
+networks:
+  ps_net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  ps_data:
