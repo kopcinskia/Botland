@@ -1,0 +1,113 @@
+/* currency_rate — PrestaShop 9 / Classic theme (Bootstrap 4) */
+
+.currency-rate-product-prices {
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.cr-pp-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.cr-pp-table {
+    font-size: 0.875rem;
+}
+
+.cr-pp-table thead th {
+    background-color: #f8f9fa;
+    border-bottom-width: 1px;
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6c757d;
+    white-space: nowrap;
+}
+
+.cr-pp-footnote {
+    font-size: 0.78rem;
+    color: #868e96;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.currency-rate-history {
+    padding: 0.25rem 0 2rem;
+}
+
+.cr-selector-form {
+    background: #f8f9fa;
+    padding: 1rem 1.25rem;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.cr-selector-form .form-row {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.cr-chart-card {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.cr-card-header {
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+.cr-card-header h5 {
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+.cr-table {
+    font-size: 0.9rem;
+}
+
+.cr-table thead th {
+    background-color: #495057;
+    color: #ffffff;
+    border-color: #454d55;
+    white-space: nowrap;
+}
+
+.cr-table thead th a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.cr-table thead th a:hover {
+    text-decoration: underline;
+}
+
+.cr-table tbody tr:hover {
+    background-color: #e8f0fe;
+}
+
+.cr-table td.text-right,
+.cr-pp-table td.text-right {
+    font-variant-numeric: tabular-nums;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+@media (max-width: 575.98px) {
+    .cr-pp-rate-col {
+        display: none;
+    }
+
+    .cr-pp-table {
+        font-size: 0.82rem;
+    }
+
+    .cr-table {
+        font-size: 0.82rem;
+    }
+}
