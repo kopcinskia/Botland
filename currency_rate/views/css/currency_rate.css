@@ -30,6 +30,10 @@
     white-space: nowrap;
 }
 
+.cr-pp-search {
+    max-width: 220px;
+}
+
 .cr-pp-footnote {
     font-size: 0.78rem;
     color: #868e96;
