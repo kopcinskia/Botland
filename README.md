@@ -26,10 +26,11 @@ Moduł prezentuje aktualne i historyczne kursy walut z API NBP (Narodowy Bank Po
 
 ## Szybki start
 
-### 1. Sklonuj / rozpakuj projekt
+### 1. Sklonuj repozytorium
 
 ```bash
-cd /ścieżka/do/projektu/BOTLAND
+git clone git@github.com:kopcinskia/Botland.git
+cd Botland
 ```
 
 ### 2. (Opcjonalnie) Skonfiguruj zmienne środowiskowe
@@ -50,45 +51,24 @@ PS_ADMIN_EMAIL=admin@example.com
 PS_ADMIN_PASSWORD=Admin1234!
 ```
 
-### 3. Uruchom kontenery
-
-> **Ważne:** jeśli uruchamiasz środowisko po raz kolejny lub poprzednia instalacja nie powiodła się, najpierw usuń stare volumes, aby uniknąć błędów inicjalizacji bazy danych:
+> **Ważne:** jeśli uruchamiasz środowisko po raz kolejny lub poprzednia instalacja nie powiodła się, najpierw usuń stare volumes:
 > ```bash
 > docker compose down -v
 > ```
 
-```bash
-docker compose up -d
-```
-
-> Pierwsze uruchomienie trwa **5–10 minut** — PrestaShop instaluje się automatycznie (`PS_INSTALL_AUTO=1`).
-
-Możesz śledzić postęp:
+### 3. Uruchom skrypt instalacyjny
 
 ```bash
-docker compose logs -f prestashop
+./setup.sh
 ```
 
-Instalacja jest zakończona, gdy w logach pojawi się komunikat:
+Skrypt automatycznie:
+1. Uruchamia kontenery (`docker compose up -d`)
+2. Czeka na zakończenie instalacji PrestaShop (do 5 minut)
+3. Rozgrzewa cache Symfony (`cache:warmup --env=prod`)
+4. Instaluje moduł `currency_rate`
 
-```
-[Success] Shop installed!
-```
-
-### 4. Rozgrzej cache PrestaShop
-
-Po zakończeniu instalacji PS 9 wymaga jednorazowego rozgrzania cache Symfony. Bez tego krok mogą wystąpić błędy `DataLayerException` przy pierwszym żądaniu HTTP.
-
-```bash
-# Nadaj uprawnienia do katalogu cache
-docker exec botland_prestashop chmod -R 777 /var/www/html/var/cache
-
-# Wygeneruj cache jako użytkownik www-data (tak samo jak Apache)
-docker exec botland_prestashop su www-data -s /bin/bash -c \
-  'php /var/www/html/bin/console cache:warmup --env=prod'
-```
-
-### 5. Otwórz PrestaShop
+### 4. Otwórz PrestaShop
 
 | Adres | Opis |
 |-------|------|
@@ -120,7 +100,7 @@ Dane logowania do BO:
 ### Sposób 2 — przez CLI w kontenerze
 
 ```bash
-docker exec -it botland_prestashop bash -c \
+docker exec botland_prestashop bash -c \
   "php bin/console prestashop:module install currency_rate"
 ```
 

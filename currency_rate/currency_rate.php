@@ -167,7 +167,7 @@ class Currency_Rate extends Module
 
     private function renderConfigPage(string $cronUrl, ?string $lastFetched): string
     {
-        $html  = '<div class="panel">';
+        $html = '<div class="panel">';
         $html .= '<div class="panel-heading"><i class="icon-money"></i> ' . $this->l('Currency Rate Settings') . '</div>';
         $html .= '<div class="form-wrapper">';
 

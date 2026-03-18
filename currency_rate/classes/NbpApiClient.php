@@ -9,18 +9,12 @@ if (!defined('_PS_VERSION_')) {
 class NbpApiClient
 {
     private const BASE_URL = 'https://api.nbp.pl/api';
-    private const TIMEOUT  = 15;
+    private const TIMEOUT = 15;
 
-    /**
-     * Pobiera kursy z ostatnich $days dni roboczych (Tabela A NBP).
-     * Zwraca spłaszczoną listę wierszy: code, name, rate, date.
-     *
-     * @throws RuntimeException
-     */
     public function fetchRates(int $days = 30): array
     {
-        $url  = sprintf('%s/exchangerates/tables/A/last/%d/?format=json', self::BASE_URL, $days);
-        $raw  = $this->get($url);
+        $url = sprintf('%s/exchangerates/tables/A/last/%d/?format=json', self::BASE_URL, $days);
+        $raw = $this->get($url);
         $rows = [];
 
         foreach ($raw as $table) {
@@ -34,7 +28,7 @@ class NbpApiClient
                 $rows[] = [
                     'code' => (string) $entry['code'],
                     'name' => (string) $entry['currency'],
-                    'rate' => (float)  $entry['mid'],
+                    'rate' => (float) $entry['mid'],
                     'date' => $date,
                 ];
             }
@@ -47,18 +41,18 @@ class NbpApiClient
     {
         $ch = curl_init();
         curl_setopt_array($ch, [
-            CURLOPT_URL            => $url,
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => self::TIMEOUT,
-            CURLOPT_USERAGENT      => 'PrestaShop/CurrencyRateModule/1.0',
-            CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+            CURLOPT_TIMEOUT => self::TIMEOUT,
+            CURLOPT_USERAGENT => 'PrestaShop/CurrencyRateModule/1.0',
+            CURLOPT_HTTPHEADER => ['Accept: application/json'],
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_FOLLOWLOCATION => true,
         ]);
 
-        $body     = curl_exec($ch);
+        $body = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error    = curl_error($ch);
+        $error = curl_error($ch);
         curl_close($ch);
 
         if ($error) {
