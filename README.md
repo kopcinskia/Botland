@@ -9,6 +9,8 @@ Moduł prezentuje aktualne i historyczne kursy walut z API NBP (Narodowy Bank Po
 - **Cache plikowy** (TTL 1h) — minimalizuje zapytania do bazy danych
 - **Cron** — automatyczna aktualizacja kursów raz dziennie
 - **Panel BO** — ręczne odświeżenie kursów + podgląd URL crona
+- **Obsługa błędów API** — błędy zapisywane w bazie, widoczne w panelu BO
+- **Paginacja** — tabela historii podzielona na strony (10 wierszy)
 
 ---
 
@@ -241,7 +243,11 @@ Hook `displayProductAdditionalInfo` odpala się przy każdym załadowaniu strony
 
 ### Podstrona historii
 
-Kontroler front-office pod adresem `/module/currency_rate/history` pobiera listę dostępnych walut i historię kursów dla wybranej waluty z ostatnich 30 dni. Dane tabelaryczne można sortować po dacie lub kursie. Wykres trendu rysowany jest przez Chart.js na podstawie danych JSON wstrzykniętych bezpośrednio w HTML strony.
+Kontroler front-office pod adresem `/module/currency_rate/history` pobiera listę dostępnych walut i historię kursów dla wybranej waluty z ostatnich 30 dni. Dane tabelaryczne można sortować po dacie lub kursie oraz przeglądać stronicami (10 wierszy na stronę). Parametr `page` w URL zachowuje aktywną walutę i kierunek sortowania. Wykres trendu rysowany jest przez Chart.js na podstawie danych JSON wstrzykniętych bezpośrednio w HTML strony — zawsze pokazuje pełne 30 dni, niezależnie od aktualnej strony tabeli.
+
+### Obsługa błędów API
+
+Każdy błąd wywołania API NBP — zarówno z crona jak i ręcznego odświeżenia w BO — jest zapisywany z datą do klucza `CURRENCY_RATE_LAST_ERROR` w `ps_configuration`. Panel BO modułu wyświetla czerwony alert z treścią błędu dopóki kolejne pomyślne pobranie kursów go nie skasuje. Błędy są równolegle logowane przez `PrestaShopLogger`.
 
 ### Aktualizacja kursów
 

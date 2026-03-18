@@ -40,6 +40,7 @@ try {
 
     $updatedAt = (new RateRepository())->getLastFetchedAt();
 
+    Configuration::deleteByName('CURRENCY_RATE_LAST_ERROR');
     PrestaShopLogger::addLog('CurrencyRate cron: rates refreshed at ' . ($updatedAt ?? 'unknown'), 1);
 
     if (PHP_SAPI === 'cli') {
@@ -49,6 +50,10 @@ try {
         echo json_encode(['status' => 'ok', 'updated_at' => $updatedAt]);
     }
 } catch (Exception $e) {
+    Configuration::updateValue(
+        'CURRENCY_RATE_LAST_ERROR',
+        date('Y-m-d H:i:s') . ': ' . $e->getMessage()
+    );
     PrestaShopLogger::addLog('CurrencyRate cron error: ' . $e->getMessage(), 3);
 
     if (PHP_SAPI === 'cli') {

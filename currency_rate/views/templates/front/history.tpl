@@ -105,6 +105,24 @@
                 </div>
             </div>
 
+            {if $totalPages > 1}
+            <nav class="mt-3" aria-label="{l s='Pagination' mod='currency_rate'}">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {if $currentPage <= 1}disabled{/if}">
+                        <a class="page-link" href="{$baseUrl|escape:'html'}?currency={$selectedCode|escape:'html'}&sort={$sort|escape:'html'}&dir={$dir|escape:'html'}&page={$currentPage - 1}">&laquo;</a>
+                    </li>
+                    {for $p = 1 to $totalPages}
+                        <li class="page-item {if $p == $currentPage}active{/if}">
+                            <a class="page-link" href="{$baseUrl|escape:'html'}?currency={$selectedCode|escape:'html'}&sort={$sort|escape:'html'}&dir={$dir|escape:'html'}&page={$p}">{$p}</a>
+                        </li>
+                    {/for}
+                    <li class="page-item {if $currentPage >= $totalPages}disabled{/if}">
+                        <a class="page-link" href="{$baseUrl|escape:'html'}?currency={$selectedCode|escape:'html'}&sort={$sort|escape:'html'}&dir={$dir|escape:'html'}&page={$currentPage + 1}">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+            {/if}
+
             <script>
             window.addEventListener('load', function () {
                 var data = {$historyJson nofilter};

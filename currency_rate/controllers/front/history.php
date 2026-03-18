@@ -65,15 +65,23 @@ class Currency_rateHistoryModuleFrontController extends ModuleFrontController
             )
         );
 
+        $perPage    = 10;
+        $totalRows  = count($history);
+        $totalPages = max(1, (int) ceil($totalRows / $perPage));
+        $page       = min($totalPages, max(1, (int) Tools::getValue('page', 1)));
+        $historyPage = array_slice($history, ($page - 1) * $perPage, $perPage);
+
         $this->context->smarty->assign([
             'currencies'   => $currencies,
             'selectedCode' => $selectedCode,
-            'history'      => $history,
+            'history'      => $historyPage,
             'historyJson'  => $historyJson,
             'errorMessage' => $errorMessage,
             'baseUrl'      => $this->context->link->getModuleLink('currency_rate', 'history'),
             'sort'         => $sort,
             'dir'          => $dir,
+            'currentPage'  => $page,
+            'totalPages'   => $totalPages,
         ]);
 
         $this->setTemplate('module:currency_rate/views/templates/front/history.tpl');

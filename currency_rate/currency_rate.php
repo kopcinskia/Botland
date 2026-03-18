@@ -139,10 +139,15 @@ class Currency_Rate extends Module
         if (Tools::isSubmit('submitRefreshRates')) {
             try {
                 $this->buildRateService()->refreshRates();
+                Configuration::deleteByName('CURRENCY_RATE_LAST_ERROR');
                 $output .= $this->displayConfirmation(
                     $this->l('Exchange rates refreshed successfully.')
                 );
             } catch (Exception $e) {
+                Configuration::updateValue(
+                    'CURRENCY_RATE_LAST_ERROR',
+                    date('Y-m-d H:i:s') . ': ' . $e->getMessage()
+                );
                 $output .= $this->displayError(
                     $this->l('Failed to refresh rates: ') . htmlspecialchars($e->getMessage())
                 );
@@ -165,6 +170,13 @@ class Currency_Rate extends Module
         $html  = '<div class="panel">';
         $html .= '<div class="panel-heading"><i class="icon-money"></i> ' . $this->l('Currency Rate Settings') . '</div>';
         $html .= '<div class="form-wrapper">';
+
+        $lastError = Configuration::get('CURRENCY_RATE_LAST_ERROR');
+        if ($lastError) {
+            $html .= '<div class="alert alert-danger">';
+            $html .= '<strong>' . $this->l('Last API error:') . '</strong> ' . htmlspecialchars($lastError);
+            $html .= '</div>';
+        }
 
         if ($lastFetched) {
             $html .= '<div class="alert alert-info">';
