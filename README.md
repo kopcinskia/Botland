@@ -214,4 +214,49 @@ Zawiera:
 - Wykres trendu (Chart.js, ostatnie 30 dni)
 - Tabelę dziennych kursów z możliwością sortowania
 
+---
+
+## Użyte technologie
+
+| Warstwa | Technologia |
+|---------|-------------|
+| Platforma | PrestaShop 9.x |
+| Język | PHP 8.4 |
+| Baza danych | MySQL 8.0 |
+| Szablony | Smarty 4 |
+| API kursów | NBP API — publiczne, bezpłatne, bez klucza |
+| Wykres | Chart.js 4 (CDN) |
+| CSS | Bootstrap 4 (Classic theme) + własne klasy z prefiksem `cr-` |
+| HTTP client | cURL (natywny PHP) |
+| Cache | Plikowy z TTL (własna implementacja) |
+| Środowisko dev | Docker Compose v2, obrazy: `prestashop/prestashop:9`, `mysql:8.0`, `phpmyadmin` |
+
+---
+
+## Jak działa moduł
+
+### Karta produktu
+
+Hook `displayProductAdditionalInfo` odpala się przy każdym załadowaniu strony produktu. Moduł pobiera aktualną cenę produktu w PLN, następnie dzieli ją przez kurs NBP dla każdej waluty i renderuje tabelę przeliczonych cen. Dane kursów trafiają najpierw do cache plikowego (TTL 1h) — dopóki cache jest świeży, baza danych nie jest odpytywana.
+
+### Podstrona historii
+
+Kontroler front-office pod adresem `/module/currency_rate/history` pobiera listę dostępnych walut i historię kursów dla wybranej waluty z ostatnich 30 dni. Dane tabelaryczne można sortować po dacie lub kursie. Wykres trendu rysowany jest przez Chart.js na podstawie danych JSON wstrzykniętych bezpośrednio w HTML strony.
+
+### Aktualizacja kursów
+
+Skrypt `cron/update_rates.php` odpytuje API NBP (`/tables/A/last/30/`) i zapisuje wyniki do tabeli `ps_currency_rate_history` przez upsert (`ON DUPLICATE KEY UPDATE`) — dzięki temu wielokrotne wywołanie nie tworzy duplikatów. Po zapisie cache jest czyszczony. Skrypt działa zarówno przez HTTP (z tokenem) jak i z CLI.
+
+---
+
+## Możliwe optymalizacje i alternatywne podejścia
+
+**Bulk INSERT zamiast pętli**
+Obecna implementacja `bulkUpsert()` wykonuje jedno zapytanie SQL per wiersz. Przy 30 dniach × 32 waluty to ~960 zapytań. Można to zastąpić jednym `INSERT INTO ... VALUES (...), (...), ... ON DUPLICATE KEY UPDATE`, co znacząco skróciłoby czas zapisu.
+
+**Symfony HttpClient zamiast cURL**
+PS 9 dostarcza Symfony HttpClient w kontenerze DI. Użycie go zamiast czystego cURL dałoby automatyczne retry, lepszą obsługę błędów i łatwiejsze testowanie przez mock.
+
+**Symfony Command zamiast skryptu cron**
+Zamiast `cron/update_rates.php` można zaimplementować `prestashop:currency-rate:update` jako Symfony Console Command i wywoływać go przez `bin/console`. Lepiej integruje się z ekosystemem PS 9 i jest prostszy do testowania.
 
